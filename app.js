@@ -11,10 +11,14 @@ app.use(express.json()); // allows us to access post request body.
 
 app.get("/api/owners/:id", (req, res) => {
   const { id } = req.params;
-  fs.readFile(`./data/owners/o${id}.json`, "utf8").then((ownerInfo) => {
-    const ownerJS = JSON.parse(ownerInfo);
-    res.send(ownerJS);
-  });
+  fs.readFile(`./data/owners/o${id}.json`, "utf8")
+    .then((ownerInfo) => {
+      const ownerJS = JSON.parse(ownerInfo);
+      res.send(ownerJS);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 });
 
 //TASK 2
@@ -33,6 +37,9 @@ app.get("/api/owners", (req, res) => {
         return JSON.parse(ownerString);
       });
       res.send(ownerInfoArrJS);
+    })
+    .catch((err) => {
+      console.log(err);
     });
 });
 
@@ -53,6 +60,9 @@ app.get("/api/owners", (req, res) => {
 //         return JSON.parse(string);
 //       });
 //       res.send(JS);
+//     })
+//     .catch((err) => {
+//       console.log(err);
 //     });
 // });
 
@@ -76,6 +86,9 @@ app.get("/api/owners/:id/pets", (req, res) => {
           return petJS.owner === `o${id}`;
         });
       res.send(petsOfOwner);
+    })
+    .catch((err) => {
+      console.log(err);
     });
 });
 
@@ -83,6 +96,8 @@ app.get("/api/owners/:id/pets", (req, res) => {
 //same as get all owners but for pets. then filter based on req.query
 
 app.get("/api/pets", (req, res) => {
+  let query = req.query.temperament;
+
   fs.readdir("./data/pets", "utf8")
     .then((pets) => {
       const promiseArr = pets.map((petFile) => {
@@ -94,7 +109,17 @@ app.get("/api/pets", (req, res) => {
       const petsJS = petInfoArr.map((pet) => {
         return JSON.parse(pet);
       });
-      res.send(petsJS);
+
+      const filteredPets = petsJS.filter((pet) => {
+        if (pet.temperament === query) {
+          return pet;
+        }
+      });
+      console.log(filteredPets);
+      res.send(filteredPets);
+    })
+    .catch((err) => {
+      console.log(err);
     });
 });
 
@@ -102,10 +127,14 @@ app.get("/api/pets", (req, res) => {
 
 app.get("/api/pets/:id", (req, res) => {
   const { id } = req.params;
-  fs.readFile(`./data/pets/p${id}.json`, "utf8").then((petInfo) => {
-    const petJS = JSON.parse(petInfo);
-    res.send(petJS);
-  });
+  fs.readFile(`./data/pets/p${id}.json`, "utf8")
+    .then((petInfo) => {
+      const petJS = JSON.parse(petInfo);
+      res.send(petJS);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 });
 
 //TASK 6
@@ -125,21 +154,38 @@ app.get("/api/pets/:id", (req, res) => {
 app.patch("/api/owners/:id/edit", (req, res) => {
   const { id } = req.params;
   const body = req.body;
-  fs.readFile(`./data/owners/o${id}.json`).then((owner) => {
-    const ownerJS = JSON.parse(owner);
-    ownerJS.name = body.name;
-    ownerJS.age = body.age;
-    console.log(ownerJS, "HERE1");
-    return fs
-      .writeFile(`./data/owners/o${id}.json`, JSON.stringify(ownerJS))
-      .then(() => {
-        res.status(201);
-        res.send(ownerJS);
-      });
-  });
+  globalOwner = "";
+  fs.readFile(`./data/owners/o${id}.json`)
+    .then((owner) => {
+      const ownerJS = JSON.parse(owner);
+      ownerJS.name = body.name;
+      ownerJS.age = body.age;
+      globalOwner = ownerJS;
+      return fs.writeFile(`./data/owners/o${id}.json`, JSON.stringify(ownerJS));
+    })
+    .then(() => {
+      console.log(globalOwner);
+      res.status(201);
+      res.send(globalOwner);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 });
 
-app.post("/api/owners/create", (req, res) => {});
+app.post("/api/owners/create", (req, res) => {
+  let body = req.body;
+  let newId = Date.now();
+  body["id"] = newId;
+  fs.writeFile(`./data/owners/o${body.id}.json`, JSON.stringify(body))
+    .then(() => {
+      res.status(200);
+      res.send(body);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
 
 app.listen(8080, (err) => {
   if (err) {
