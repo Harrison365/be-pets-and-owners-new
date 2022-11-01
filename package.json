@@ -1,0 +1,27 @@
+{
+  "name": "be-pets-and-owners-new",
+  "version": "1.0.0",
+  "description": "test test",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Harrison365/be-pets-and-owners-new.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Harrison365/be-pets-and-owners-new/issues"
+  },
+  "homepage": "https://github.com/Harrison365/be-pets-and-owners-new#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
