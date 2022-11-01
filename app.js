@@ -53,8 +53,11 @@ app.get("/api/owners/:id/pets", (req, res) => {
       return Promise.all(promiseArr);
     })
     .then((petsInfoArr) => {
-      console.log(petsInfoArr);
-      //res.send();
+      const petsOfOwner = petsInfoArr.filter((pet) => {
+        return pet.owner === `o${id}`;
+      });
+
+      res.send(petsOfOwner);
     });
 });
 
