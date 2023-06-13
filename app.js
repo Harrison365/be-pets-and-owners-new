@@ -14,10 +14,11 @@ app.get("/api/owners/:id", (req, res) => {
   fs.readFile(`./data/owners/o${id}.json`, "utf8")
     .then((ownerInfo) => {
       const ownerJS = JSON.parse(ownerInfo);
-      res.send(ownerJS);
+      res.status(200).send(ownerJS);
     })
     .catch((err) => {
       console.log(err);
+      res.status(404).send(err);
     });
 });
 
