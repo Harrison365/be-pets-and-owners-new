@@ -8,7 +8,7 @@ const app = express();
 app.use(express.json()); // allows us to access post request body.
 
 //TASK 1
-
+//e.g. /api/owners/1
 app.get("/api/owners/:id", (req, res) => {
   const { id } = req.params;
   fs.readFile(`./data/owners/o${id}.json`, "utf8")
