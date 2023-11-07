@@ -190,6 +190,77 @@ app.post("/api/owners/create", (req, res) => {
     });
 });
 
+//TASK 8
+app.post("/api/owners/:id/pets", (req, res) => {
+  const { id } = req.params;
+  const body = req.body;
+
+  if (
+    body.name &&
+    body.avatarUrl &&
+    body.favouriteFood &&
+    body.age &&
+    body.temperament
+  ) {
+    let newId = Date.now();
+    body["id"] = newId;
+    body["owner"] = `o${id}`;
+    fs.writeFile(`./data/pets/p${body.id}.json`, JSON.stringify(body))
+      .then(() => {
+        res.status(200);
+        res.send(body);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  } else {
+    res.status(400);
+    res.send({ msg: "wrong format bruh" });
+  }
+});
+
+//TASK 9
+app.delete("/api/pets/:id", (req, res) => {
+  let { id } = req.params;
+  fs.unlink(`./data/pets/p${id}.json`).then(() => {
+    res.status(200);
+    res.send({ msg: `p${id} deleted` });
+  });
+});
+
+//TASK 10
+app.delete("/api/owners/:id", (req, res) => {
+  let { id } = req.params;
+  fs.unlink(`./data/owners/o${id}.json`)
+    .then(() => {
+      return fs.readdir("./data/pets", "utf8");
+    })
+    .then((files) => {
+      const promiseArrOwners = files.map((file) => {
+        return fs.readFile(`./data/pets/${file}`, "utf8");
+      });
+      return Promise.all(promiseArrOwners);
+    })
+    .then((pets) => {
+      const petsJS = pets.map((pet) => {
+        return JSON.parse(pet);
+      });
+      const filteredPets = petsJS.filter((pet) => {
+        if (pet.owner === `o${id}`) {
+          return pet;
+        }
+      });
+      const promiseArrPets = filteredPets.map((pet) => {
+        return fs.unlink(`./data/pets/${pet.id}.json`);
+      });
+      return Promise.all(promiseArrPets);
+    })
+    .then(() => {
+      res.status(200);
+      res.send({ msg: `o${id} deleted` });
+    });
+});
+
 app.listen(8080, (err) => {
   if (err) {
     console.log(err);
