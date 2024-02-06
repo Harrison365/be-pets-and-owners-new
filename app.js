@@ -178,8 +178,10 @@ app.patch("/api/owners/:id/edit", (req, res) => {
 
 app.post("/api/owners/create", (req, res) => {
   let body = req.body;
-  let newId = Date.now();
+  let newId = `o${Date.now().toString()}`;
   body["id"] = newId;
+
+  console.log(body);
   fs.writeFile(`./data/owners/o${body.id}.json`, JSON.stringify(body))
     .then(() => {
       res.status(200);
